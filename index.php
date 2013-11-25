@@ -25,14 +25,21 @@
 	*/
 
 	//populate table (testing mode)
-        $STH = $DBH->prepare("
+        try{
+	$STH = $DBH->prepare("
 		LOAD DATA  INFILE './home/dj253/public_html/is218/hd2011.csv' INTO TABLE colleges 
 		FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'
-		LINES TERMINATED BY '\n'
+		LINES TERMINATED BY '\\n'
 		IGNORE 1 LINES
 		(unitid, instnm, addr, city, stabbr, zip, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, webaddr, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy)
 		");
-        $STH->execute();
+	$STH->execute();
+	}
+        catch(PDOException $e) {
+                echo $e->getMessage();
+        }
+
+
         //
 	// perform insert
 	//$STH = $DBH->prepare("INSERT INTO departments (dept_no, dept_name) values ('253', 'dave')");
