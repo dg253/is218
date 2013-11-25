@@ -8,7 +8,7 @@
 		echo $e->getMessage();
 	}
 
-	//create table
+	/*create table (tested and it works)
 	$STH = $DBH->prepare("
 		CREATE TABLE colleges(
 		unitid INT NOT NULL, 
@@ -22,6 +22,8 @@
 		);
  	");
 	$STH->execute();
+	*/
+
 	// perform insert
 	//$STH = $DBH->prepare("INSERT INTO departments (dept_no, dept_name) values ('253', 'dave')");
 	//$STH->execute();
