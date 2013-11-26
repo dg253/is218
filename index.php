@@ -1,61 +1,41 @@
 <?php
 	try {
-		// MySQL with PDO_MYSQL  
+		// MySQL with PDO_MYSQL
 		$DBH = new PDO("mysql:host=localhost;dbname=dj253", 'dj253', 'dj253$1234');
-		echo 'connection to host is good'. "<br>";
+		echo 'connection to host is good'. "<br>". "\n";
 	}
 	catch(PDOException $e) {
 		echo $e->getMessage();
 	}
 
-	/*create table (tested and it works)
-	$STH = $DBH->prepare("
-		CREATE TABLE colleges(
-		unitid INT NOT NULL, 
-		instnm VARCHAR(100) NOT NULL, 
-		addr VARCHAR(100) NOT NULL, 
-		city VARCHAR(30) NOT NULL, 
-		stabbr VARCHAR(2) NOT NULL, 
-		zip VARCHAR(10) NOT NULL, 
-		webaddr VARCHAR(100) NOT NULL,
-		PRIMARY KEY ( unitid ) 
-		);
- 	");
-	$STH->execute();
-	*/
-
-	//populate table (testing mode)
-        try{
-	$STH = $DBH->prepare("
-		LOAD DATA  INFILE './home/dj253/public_html/is218/hd2011.csv' INTO TABLE colleges 
-		FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '\"'
-		LINES TERMINATED BY '\\n'
-		IGNORE 1 LINES
-		(unitid, instnm, addr, city, stabbr, zip, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, webaddr, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy, @dummy, @dummy, @dummy, @dummy, @dummy,@dummy)
-		");
-	$STH->execute();
-	}
-        catch(PDOException $e) {
-                echo $e->getMessage();
-        }
-
-
-        //
-	// perform insert
-	//$STH = $DBH->prepare("INSERT INTO departments (dept_no, dept_name) values ('253', 'dave')");
-	//$STH->execute();
-	
-	/* perform select */
-	//$STH = $DBH->query('SELECT last_name,first_name from employees where last_name="Baba" order by first_name asc');
-	
+	//perform select
+	$STH = $DBH->query('SELECT c.unitid,c.instnm,e.efytotlt FROM colleges as c JOIN enrollment as e on c.unitid=e.unitid  order by e.efytotlt   desc limit 5');
 	// setting the fetch mode
-	//$STH->setFetchMode(PDO::FETCH_ASSOC);
+	$STH->setFetchMode(PDO::FETCH_ASSOC);
 
-	/*
+	echo '<table border="1">'. "\n";
 	while( $row = $STH->fetch() ){
-		echo $row['last_name'] . ", ";
-		echo $row['first_name'] . ". <br>";
+		echo '<tr>'. "\n";
+		echo '<td>'. $row['unitid'] . '</td>'. "\n";
+		echo '<td>'. $row['instnm'] . '</td>'. "\n";
+                echo '<td>'. $row['efytotlt'] . '</td>'. "\n";
+		echo '</tr>'. "\n";
 	}
-	*/
+	echo '</table>'. "\n";
+
+	//perform select
+        $STH = $DBH->query('SELECT c.unitid,c.instnm,f.f1a06 as "total assets" FROM colleges as c JOIN finance as f on c.unitid=f.unitid  order by "total assets"  desc limit 5');
+        // setting the fetch mode
+        $STH->setFetchMode(PDO::FETCH_ASSOC);
+
+        echo '<table border="1">'. "\n";
+        while( $row = $STH->fetch() ){
+                echo '<tr>'. "\n";
+                echo '<td>'. $row['unitid'] . '</td>'. "\n";
+                echo '<td>'. $row['instnm'] . '</td>'. "\n";
+                echo '<td>'. $row['total assets'] . '</td>'. "\n";
+                echo '</tr>'. "\n";
+        }
+        echo '</table>'. "\n";
 
 ?> 
