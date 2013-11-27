@@ -19,7 +19,7 @@
 		echo '<tr>'. "\n";
 		echo '<td>'. $row['unitid'] . '</td>'. "\n";
 		echo '<td>'. $row['instnm'] . '</td>'. "\n";
-        echo '<td>'. $row['efytotlt'] . '</td>'. "\n";
+    		echo '<td>'. $row['efytotlt'] . '</td>'. "\n";
 		echo '</tr>'. "\n";
 	}
 	echo '</table>'. "\n";
@@ -32,7 +32,7 @@
 
     echo '<table border="1">'. "\n";
     while( $row = $STH->fetch() ){
-    		echo '<tr>'. "\n";
+    	echo '<tr>'. "\n";
         echo '<td>'. $row['unitid'] . '</td>'. "\n";
         echo '<td>'. $row['instnm'] . '</td>'. "\n";
         echo '<td>'. $row['totalLiabilities'] . '</td>'. "\n";
@@ -48,7 +48,7 @@
 
     echo '<table border="1">'. "\n";
     while( $row = $STH->fetch() ){
-    		echo '<tr>'. "\n";
+    	echo '<tr>'. "\n";
         echo '<td>'. $row['unitid'] . '</td>'. "\n";
         echo '<td>'. $row['instnm'] . '</td>'. "\n";
         echo '<td>'. $row['totalNetAssets'] . '</td>'. "\n";
@@ -63,7 +63,7 @@
     $STH->setFetchMode(PDO::FETCH_ASSOC);
     echo '<table border="1">'. "\n";
 	while( $row = $STH->fetch() ){
-    		echo '<tr>'. "\n";
+    	echo '<tr>'. "\n";
         echo '<td>'. $row['unitid'] . '</td>'. "\n";
         echo '<td>'. $row['instnm'] . '</td>'. "\n";
         echo '<td>'. $row['totalRevenues'] . '</td>'. "\n";
@@ -78,7 +78,7 @@
     $STH->setFetchMode(PDO::FETCH_ASSOC);
     echo '<table border="1">'. "\n";
 	while( $row = $STH->fetch() ){
-    		echo '<tr>'. "\n";
+    	echo '<tr>'. "\n";
         echo '<td>'. $row['unitid'] . '</td>'. "\n";
         echo '<td>'. $row['instnm'] . '</td>'. "\n";
         echo '<td> liabilities\\student: '. $row['totalLiabilitiesPerStudent'] . '</td>'. "\n";
@@ -93,7 +93,7 @@
     $STH->setFetchMode(PDO::FETCH_ASSOC);
     echo '<table border="1">'. "\n";
 	while( $row = $STH->fetch() ){
-    		echo '<tr>'. "\n";
+    	echo '<tr>'. "\n";
         echo '<td>'. $row['unitid'] . '</td>'. "\n";
         echo '<td>'. $row['instnm'] . '</td>'. "\n";
         echo '<td> netAssets\\student: '. $row['totalNetAssetsPerStudent'] . '</td>'. "\n";
@@ -108,12 +108,64 @@
     $STH->setFetchMode(PDO::FETCH_ASSOC);
     echo '<table border="1">'. "\n";
 	while( $row = $STH->fetch() ){
-    		echo '<tr>'. "\n";
+    	echo '<tr>'. "\n";
         echo '<td>'. $row['unitid'] . '</td>'. "\n";
         echo '<td>'. $row['instnm'] . '</td>'. "\n";
         echo '<td> revenue\\student: '. $row['totalRevenuesPerStudent'] . '</td>'. "\n";
         echo '</tr>'. "\n";
     }
     echo '</table>'. "\n";
+
+	//perform select
+	$STH = $DBH->query('
+	SELECT f.unitid, c.instnm,(f.f1a13/(SELECT f1a13 FROM finance WHERE year=2010 limit 1))/(SELECT f1a13 FROM finance WHERE year=2010 limit 1) as liabilityChange 
+	FROM finance as f 
+	JOIN colleges as c ON f.unitid=c.unitid
+	WHERE f.year=2011
+	GROUP BY f.unitid
+	ORDER BY liabilityChange desc
+	LIMIT 5');
+    
 	
+	$STH = $DBH->query('
+	SELECT @2011 := f.unitid as unitid, c.instnm,(((f.f1a13/(SELECT f1a13 FROM finance WHERE unitid=@2011 and year=2010 limit 1))-1)*100) as percentageChange 
+	FROM finance as f 
+	JOIN colleges as c ON f.unitid=c.unitid
+	WHERE f.year=2011
+	LIMIT 5');
+	
+	
+	// setting the fetch mode
+    $STH->setFetchMode(PDO::FETCH_ASSOC);
+    echo '<table border="1">'. "\n";
+	while( $row = $STH->fetch() ){
+    	echo '<tr>'. "\n";
+        echo '<td>'. $row['unitid'] . '</td>'. "\n";
+        echo '<td>'. $row['instnm'] . '</td>'. "\n";
+        echo '<td> percentage\\change: '. $row['percentageChange'] . '</td>'. "\n";
+        echo '</tr>'. "\n";
+    }
+    echo '</table>'. "\n";
+
+	$STH = $DBH->query('
+	SELECT @2011 := e.unitid as unitid, c.instnm,(((e.efytotlt/(SELECT efytotlt FROM enrollment  WHERE unitid=@2011 and year=2010 limit 1))-1)*100) as percentageChange 
+	FROM enrollment as c 
+	JOIN colleges as c ON e.unitid=c.unitid
+	WHERE e.year=2011
+	LIMIT 5');
+	
+	
+	// setting the fetch mode
+    $STH->setFetchMode(PDO::FETCH_ASSOC);
+    echo '<table border="1">'. "\n";
+	while( $row = $STH->fetch() ){
+    	echo '<tr>'. "\n";
+        echo '<td>'. $row['unitid'] . '</td>'. "\n";
+        echo '<td>'. $row['instnm'] . '</td>'. "\n";
+        echo '<td> percentage\\change: '. $row['percentageChange'] . '</td>'. "\n";
+        echo '</tr>'. "\n";
+    }
+    echo '</table>'. "\n";
+
+
 ?> 
