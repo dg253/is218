@@ -148,7 +148,7 @@
     echo '</table>'. "\n";
 
 	$STH = $DBH->query('
-	SELECT @2011 := e.unitid as unitid, c.instnm,(((e.efytotlt/(SELECT efytotlt FROM enrollment  WHERE unitid=@2011 and year=2010 limit 1))-1)*100) as percentageChange 
+	SELECT @2011 := e.unitid as unitid, c.instnm,(((e.efytotlt/(SELECT efytotlt FROM enrollment WHERE unitid=@2011 and year=2010 limit 1))-1)*100) as percentageChange 
 	FROM enrollment as c 
 	JOIN colleges as c ON e.unitid=c.unitid
 	WHERE e.year=2011
@@ -162,7 +162,7 @@
     	echo '<tr>'. "\n";
         echo '<td>'. $row['unitid'] . '</td>'. "\n";
         echo '<td>'. $row['instnm'] . '</td>'. "\n";
-        echo '<td> percentage\\change: '. $row['percentageChange'] . '</td>'. "\n";
+        echo '<td> enrollment\\change: '. $row['percentageChange'] . '</td>'. "\n";
         echo '</tr>'. "\n";
     }
     echo '</table>'. "\n";
