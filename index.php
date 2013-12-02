@@ -147,6 +147,7 @@ abstract class page {
     }
     echo '</table>'. "\n";
 	}
+
 }
 
 class homepage extends page {
@@ -210,6 +211,73 @@ class q8 extends page {
     $this->content .= $this->menu();
     $this->content .= $this->q678('finance','f1b25','totalRevenuesPerStudent');
     }    
+}
+
+class q10 extends page {
+	function get()
+	{
+    $this->content .= $this->menu();
+    $this->content .= $this->pickState();
+    }
+	
+	function pickState(){
+	echo ('<form action="index.php?page=q10" method="post" id="pickState">
+            <P>
+            <LABEL for="state">PickState: </LABEL>');
+  	echo ('<INPUT type="submit"> <INPUT type="reset">
+         </P>
+        </form>');
+	echo ('<select name="states" form="pickState">');
+	$STH = $this->states();
+	while( $row = $STH->fetch() ){
+	echo '<option value="'.$row['stabbr'].'">'. $row['stabbr'] . '</option>'. "\n";
+	}
+    	echo ('</select>'. "\n");
+	}
+	
+	function states(){
+	$DBH = new PDO("mysql:host=localhost;dbname=dj253", 'dj253', 'dj253$1234');
+	
+	$STH = $DBH->query('
+	select distinct stabbr 
+	from colleges 
+	order by stabbr asc;'
+	);
+	
+    $STH->setFetchMode(PDO::FETCH_ASSOC);
+	
+	return $STH;
+	}
+	
+	function showColleges($state){
+	$DBH = new PDO("mysql:host=localhost;dbname=dj253", 'dj253', 'dj253$1234');
+	
+	$STH = $DBH->query('
+	select instnm 
+	from colleges 
+	where stabbr=\''.$state. '\'
+	');
+	
+	$STH->setFetchMode(PDO::FETCH_ASSOC);
+	
+    echo '<table border="1">'. "\n";
+	while( $row = $STH->fetch() ){
+    		echo '<tr>'. "\n";
+        echo '<td>'. $row['instnm'] . '</td>'. "\n";
+    		echo '</tr>'. "\n";
+    	}
+    echo '</table>'. "\n";
+	}
+	
+	function post()
+    {
+    	foreach ($_POST as $key => $value) {
+        $this->content .= $this->showColleges($value);
+    	}
+		
+    $this->content .= $this->menu();
+    }
+        
 }
 
 class q11 extends page {
