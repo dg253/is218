@@ -214,15 +214,51 @@ class q8 extends page {
 }
 
 class q9 extends page {
-    function get()
-    {
-    $this->content .= $this->menu();
-    $this->content .= $this->underConstruction();
-    }    
+    function get() {
+    	$this->content .= $this->menu();
+    $this->content .= $this->showTable('totalStudents','2010');
+    }
 	
-	function underConstruction(){
-		$user = 'Under development.  Come back soon';
-		return $user;
+	function showTable($column,$year){
+	$DBH = new PDO("mysql:host=localhost;dbname=dj253", 'dj253', 'dj253$1234');
+	
+	if(isset($column)){
+		if(isset($year)){
+			$STH = $DBH->query('
+			SELECT *
+			FROM q9
+			WHERE year='.$year.'
+			ORDER BY '.$column.' desc
+			LIMIT 10');
+		}else{
+			$STH = $DBH->query('
+			SELECT *
+			From q9
+			ORDER BY '.$column.' desc
+			LIMIT 10');
+		}
+	}else{
+		$STH = $DBH->query('
+		SELECT *
+		From q9');
+	}
+	
+    $STH->setFetchMode(PDO::FETCH_ASSOC);
+
+    echo '<table border="1">'. "\n";
+	while( $row = $STH->fetch() ){
+    		echo '<tr>'. "\n";
+        echo '<td>'. $row['unitid'] . '</td>'. "\n";
+        echo '<td>'. $row['instnm'] . '</td>'. "\n";
+		echo '<td>'. $row['stabbr'] . '</td>'. "\n";
+		echo '<td>'. $row['year'] . '</td>'. "\n";
+		echo '<td>'. $row['totalStudents'] . '</td>'. "\n";
+		echo '<td>'. $row['liabilities'] . '</td>'. "\n";
+		echo '<td>'. $row['netAssets'] . '</td>'. "\n";
+		echo '<td>'. $row['revenues'] . '</td>'. "\n";
+        echo '</tr>'. "\n";
+    }
+    echo '</table>'. "\n";
 	}
 }
 
@@ -249,6 +285,7 @@ class q10 extends page {
          </P>
         </form>');
 	}
+	
 	function getStates(){
 	$DBH = new PDO("mysql:host=localhost;dbname=dj253", 'dj253', 'dj253$1234');
 	
@@ -284,14 +321,12 @@ class q10 extends page {
     echo '</table>'. "\n";
 	}
 	
-	function post()
-    {
-    	foreach ($_POST as $key => $value) {
-        $this->content .= $this->showColleges($value);
-    	}
-		
-    $this->content .= $this->menu();
-    }       
+	function post(){
+		foreach ($_POST as $key => $value) {
+			$this->content .= $this->showColleges($value);
+		}
+		$this->content .= $this->menu();
+	}       
 }
 
 class q11 extends page {
