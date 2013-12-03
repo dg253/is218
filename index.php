@@ -39,6 +39,7 @@ abstract class page {
         $menu .= '<a href="./index.php?page=q9">Question 9</a> </br>';
         $menu .= '<a href="./index.php?page=q10">Question 10</a> </br>';
         $menu .= '<a href="./index.php?page=q11">Question 11</a> </br> ';
+        $menu .= '<a href="./index.php?page=q12">Question 12</a> </br> ';
         return $menu;
     }
     
@@ -104,7 +105,7 @@ abstract class page {
 	$DBH = new PDO("mysql:host=localhost;dbname=dj253", 'dj253', 'dj253$1234');
 	
 	$STH = $DBH->query('
-	SELECT '.$table.'.unitid, c.instnm, '.$table.'.'.$column.'/e.efytotlt as '.$note.' 
+	SELECT '.$table.'.unitid, c.instnm, '.$table.'.'.$column.'/e.totalStudents as '.$note.' 
 	FROM '.$table.' 
 	JOIN colleges as c ON '.$table.'.unitid=c.unitid 
 	JOIN enrollment as e ON c.unitid=e.unitid 
@@ -128,7 +129,7 @@ abstract class page {
 	$DBH = new PDO("mysql:host=localhost;dbname=dj253", 'dj253', 'dj253$1234');
 	
 	$STH = $DBH->query('
-	SELECT @2011 := e.unitid as unitid, c.instnm,((('.$table.'.'.$column.'/(SELECT '.$column.' FROM '.$table.' WHERE unitid=@2011 and year=2010 limit 1))-1)*100) as '.$note.' 
+	SELECT @2011 := '.$table.'.unitid as unitid, c.instnm,((('.$table.'.'.$column.'/(SELECT '.$column.' FROM '.$table.' WHERE unitid=@2011 and year=2010 limit 1))-1)) as '.$note.' 
 	FROM '.$table.' 
 	JOIN colleges as c ON '.$table.'.unitid=c.unitid
 	WHERE '.$table.'.year=2011
@@ -147,7 +148,6 @@ abstract class page {
     }
     echo '</table>'. "\n";
 	}
-
 }
 
 class homepage extends page {
@@ -161,7 +161,7 @@ class q1 extends page {
     function get()
     {
     $this->content .= $this->menu();
-    $this->content .= $this->q1235('enrollment','efytotlt');
+    $this->content .= $this->q1235('enrollment','totalStudents');
     }
 }
 
@@ -169,7 +169,7 @@ class q2 extends page {
     function get()
     {
     $this->content .= $this->menu();
-    $this->content .= $this->q1235('finance','f1a13');
+    $this->content .= $this->q1235('finance','liabilities');
     }
 }
 
@@ -177,7 +177,7 @@ class q3 extends page {
     function get()
     {
     $this->content .= $this->menu();
-    $this->content .= $this->q1235('finance','f1a18');
+    $this->content .= $this->q1235('finance','netAssets');
     }
 }
 
@@ -185,7 +185,7 @@ class q5 extends page {
     function get()
     {
     $this->content .= $this->menu();
-    $this->content .= $this->q1235('finance','f1b25');
+    $this->content .= $this->q1235('finance','revenues');
     }
 }
 
@@ -193,7 +193,7 @@ class q6 extends page {
     function get()
     {
     $this->content .= $this->menu();
-    $this->content .= $this->q678('finance','f1a13','totalLiabilitiesPerStudent');
+    $this->content .= $this->q678('finance','revenues','totalRevenuesPerStudent');
     }    
 }
 
@@ -201,7 +201,7 @@ class q7 extends page {
     function get()
     {
     $this->content .= $this->menu();
-    $this->content .= $this->q678('finance','f1a18','totalNetAssetsPerStudent');
+    $this->content .= $this->q678('finance','netAssets','totalNetAssetsPerStudent');
     }    
 }
 
@@ -209,8 +209,21 @@ class q8 extends page {
     function get()
     {
     $this->content .= $this->menu();
-    $this->content .= $this->q678('finance','f1b25','totalRevenuesPerStudent');
+    $this->content .= $this->q678('finance','liabilities','totalLiabilitiesPerStudent');
     }    
+}
+
+class q9 extends page {
+    function get()
+    {
+    $this->content .= $this->menu();
+    $this->content .= $this->underConstruction();
+    }    
+	
+	function underConstruction(){
+		$user = 'Under development.  Come back soon';
+		return $user;
+	}
 }
 
 class q10 extends page {
@@ -224,18 +237,19 @@ class q10 extends page {
 	echo ('<form action="index.php?page=q10" method="post" id="pickState">
             <P>
             <LABEL for="state">PickState: </LABEL>');
-  	echo ('<INPUT type="submit"> <INPUT type="reset">
-         </P>
-        </form>');
+  	
 	echo ('<select name="states" form="pickState">');
-	$STH = $this->states();
+	$STH = $this->getStates();
 	while( $row = $STH->fetch() ){
 	echo '<option value="'.$row['stabbr'].'">'. $row['stabbr'] . '</option>'. "\n";
 	}
     	echo ('</select>'. "\n");
-	}
 	
-	function states(){
+	echo ('<INPUT type="submit"> <INPUT type="reset">
+         </P>
+        </form>');
+	}
+	function getStates(){
 	$DBH = new PDO("mysql:host=localhost;dbname=dj253", 'dj253', 'dj253$1234');
 	
 	$STH = $DBH->query('
@@ -256,6 +270,7 @@ class q10 extends page {
 	select instnm 
 	from colleges 
 	where stabbr=\''.$state. '\'
+	ORDER BY instnm asc
 	');
 	
 	$STH->setFetchMode(PDO::FETCH_ASSOC);
@@ -276,60 +291,23 @@ class q10 extends page {
     	}
 		
     $this->content .= $this->menu();
-    }
-        
+    }       
 }
 
 class q11 extends page {
     function get()
     {
     $this->content .= $this->menu();
-    $this->content .= $this->q1112('finance','f1a13','percentageChange');
+    $this->content .= $this->q1112('finance','liabilities','percentageChange');
     }    
 }
-/*
-	
-	$STH = $DBH->query('
-	SELECT @2011 := f.unitid as unitid, c.instnm,(((f.f1a13/(SELECT f1a13 FROM finance WHERE unitid=@2011 and year=2010 limit 1))-1)*100) as percentageChange 
-	FROM finance as f 
-	JOIN colleges as c ON f.unitid=c.unitid
-	WHERE f.year=2011
-	ORDER BY percentageChange desc
-	LIMIT 5');
-	
-	
-	// setting the fetch mode
-    $STH->setFetchMode(PDO::FETCH_ASSOC);
-    echo '<table border="1">'. "\n";
-	while( $row = $STH->fetch() ){
-    	echo '<tr>'. "\n";
-        echo '<td>'. $row['unitid'] . '</td>'. "\n";
-        echo '<td>'. $row['instnm'] . '</td>'. "\n";
-        echo '<td> percentage\\change: '. $row['percentageChange'] . '</td>'. "\n";
-        echo '</tr>'. "\n";
-    }
-    echo '</table>'. "\n";
 
-	$STH = $DBH->query('
-	SELECT @2011 := e.unitid as unitid, c.instnm,(((e.efytotlt/(SELECT efytotlt FROM enrollment WHERE unitid=@2011 and year=2010 limit 1))-1)*100) as percentageChange 
-	FROM enrollment as e 
-	JOIN colleges as c ON e.unitid=c.unitid
-	WHERE e.year=2011
-	ORDER BY percentageChange desc
-	LIMIT 5');
-	
-	
-	// setting the fetch mode
-    $STH->setFetchMode(PDO::FETCH_ASSOC);
-    echo '<table border="1">'. "\n";
-	while( $row = $STH->fetch() ){
-    	echo '<tr>'. "\n";
-        echo '<td>'. $row['unitid'] . '</td>'. "\n";
-        echo '<td>'. $row['instnm'] . '</td>'. "\n";
-        echo '<td> enrollment\\change: '. $row['percentageChange'] . '</td>'. "\n";
-        echo '</tr>'. "\n";
-    }
-    echo '</table>'. "\n";
-*/
+class q12 extends page {
+    function get()
+    {
+    $this->content .= $this->menu();
+    $this->content .= $this->q1112('enrollment','totalStudents','percentageChange');
+    }    
+}
 
 ?> 
